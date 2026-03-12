@@ -114,9 +114,30 @@ function getIdleTime(startTime, endTime) {
 // idleTime: (typeof string) formatted as h:mm:ss
 // Returns: string formatted as h:mm:ss
 // ============================================================
-function getActiveTime(shiftDuration, idleTime) {
-    // TODO: Implement this function
+
+    // TODO: Implement this functio
+    function getActiveTime(shiftDuration, idleTime) {
+    function durationToSeconds(durationStr) {
+        let parts = durationStr.trim().split(":");
+        let hours = parseInt(parts[0]);
+        let minutes = parseInt(parts[1]);
+        let seconds = parseInt(parts[2]);
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+
+function secondsToDuration(totalSeconds) {
+        let hours = Math.floor(totalSeconds / 3600);        
+    let minutes = Math.floor((totalSeconds % 3600) / 60);
+        let seconds = totalSeconds % 60;
+
+        return hours + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    }
+    let shiftSeconds = durationToSeconds(shiftDuration);
+    let idleSeconds = durationToSeconds(idleTime);
+    let activeSeconds = shiftSeconds - idleSeconds;
+    return secondsToDuration(activeSeconds);
 }
+
 
 // ============================================================
 // Function 4: metQuota(date, activeTime)
