@@ -58,6 +58,54 @@ function timeToSeconds(timeStr) {
 // ============================================================
 function getIdleTime(startTime, endTime) {
     // TODO: Implement this function
+    function timeToSeconds(timeStr) {
+        let parts = timeStr.trim().split(" ");
+        let timePart = parts[0];
+        let period = parts[1].toLowerCase();
+
+        let timePieces = timePart.split(":");
+        let hours = parseInt(timePieces[0]);
+        let minutes = parseInt(timePieces[1]);
+        let seconds = parseInt(timePieces[2]);
+
+        if (period === "am") {
+            if (hours === 12) {
+                hours = 0;
+            }
+        } else {
+            if (hours !== 12) {
+                hours += 12;
+            }
+        }
+
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    function secondsToDuration(totalSeconds) {
+        let hours = Math.floor(totalSeconds / 3600);
+        let minutes = Math.floor((totalSeconds % 3600) / 60);
+        let seconds = totalSeconds % 60;
+
+        return hours + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    }
+
+    let startSeconds = timeToSeconds(startTime);
+    let endSeconds = timeToSeconds(endTime);
+
+    let deliveryStart = 8 * 3600;   // 8 am
+    let deliveryEnd = 22 * 3600;    // 10pm prolly
+
+    let idleSeconds = 0;
+
+    if (startSeconds < deliveryStart) {
+        idleSeconds += deliveryStart - startSeconds;
+    }
+
+    if (endSeconds > deliveryEnd) {
+        idleSeconds += endSeconds - deliveryEnd;
+    }
+
+    return secondsToDuration(idleSeconds);
 }
 
 // ============================================================
