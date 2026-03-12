@@ -1,51 +1,56 @@
-const fs = require("fs");
+const fs = require("fs"); //helper methods
+function timeToSeconds(timeStr) {
+    let parts = timeStr.trim().split(" ")
+    let timePart = parts[0]
+    let period = parts[1].toLowerCase()
+
+    let timePieces = timePart.split(":")
+    let hours = parseInt(timePieces[0])
+    let minutes = parseInt(timePieces[1])
+    let seconds = parseInt(timePieces[2])
+
+    if (period == "am") {
+        if (hours == 12) {
+            hours = 0
+        }
+    }
+    else if (period == "pm") {
+        if (hours != 12) {
+            hours += 12
+        }
+    }
+
+    return hours * 3600 + minutes * 60 + seconds
+}
+
+function durationToSeconds(time) {
+    let parts = time.trim().split(":")
+    let h = parseInt(parts[0])
+    let m = parseInt(parts[1])
+    let s = parseInt(parts[2])
+
+    return h * 3600 + m * 60 + s
+}
+
+function secondsToDuration(totalSeconds) {
+    let h = Math.floor(totalSeconds / 3600)
+    let m = Math.floor((totalSeconds % 3600) / 60)
+    let s = totalSeconds % 60
+
+    return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0")
+}
 // ============================================================
 // Function 1: getShiftDuration(startTime, endTime)
 // startTime: (typeof string) formatted as hh:mm:ss am or hh:mm:ss pm
 // endTime: (typeof string) formatted as hh:mm:ss am or hh:mm:ss pm
 // Returns: string formatted as h:mm:ss
 // ============================================================
-function getShiftDuration(startTime, endTime) {
-    // TODO: Implement this function
-    function timeToSeconds(timeStr) {
-        let parts = timeStr.trim().split(" ");
-        let timePart = parts[0];
-        let period = parts[1].toLowerCase();
+function getShiftDuration(startTime, endTime) { //replaced with simplified helper method
+let startSeconds = timeToSeconds(startTime)
+    let endSeconds = timeToSeconds(endTime)
+    let durationSeconds = endSeconds - startSeconds
 
-        let timePieces = timePart.split(":");
-        let hours = parseInt(timePieces[0]);
-        let minutes = parseInt(timePieces[1]);
-        let seconds = parseInt(timePieces[2]);
-
-        if (period === "am") {
-            if (hours === 12) {
-                hours = 0;
-            }
-        } else if (period === "pm") {
-            if (hours !== 12) {
-                hours += 12;
-            }
-        }
-
-        return hours * 3600 + minutes * 60 + seconds;
-    }
-
-    function secondsToDuration(totalSeconds) {
-        let hours = Math.floor(totalSeconds / 3600);
-        let minutes = Math.floor((totalSeconds % 3600) / 60);
-        let seconds = totalSeconds % 60;
-
-        let minutesStr = String(minutes).padStart(2, "0");
-        let secondsStr = String(seconds).padStart(2, "0");
-
-        return hours + ":" + minutesStr + ":" + secondsStr;
-    }
-
-    let startSeconds = timeToSeconds(startTime);
-    let endSeconds = timeToSeconds(endTime);
-    let durationSeconds = endSeconds - startSeconds;
-
-    return secondsToDuration(durationSeconds);
+    return secondsToDuration(durationSeconds)
 }
 
 
@@ -55,56 +60,24 @@ function getShiftDuration(startTime, endTime) {
 // endTime: (typeof string) formatted as hh:mm:ss am or hh:mm:ss pm
 // Returns: string formatted as h:mm:ss
 // ============================================================
-function getIdleTime(startTime, endTime) {
-    // TODO: Implement this function
-    function timeToSeconds(timeStr) {
-        let parts = timeStr.trim().split(" ");
-        let timePart = parts[0];
-        let period = parts[1].toLowerCase();
+function getIdleTime(startTime, endTime) { //replaced with simplified helper method
+   let startSeconds = timeToSeconds(startTime)
+    let endSeconds = timeToSeconds(endTime)
 
-        let timePieces = timePart.split(":");
-        let hours = parseInt(timePieces[0]);
-        let minutes = parseInt(timePieces[1]);
-        let seconds = parseInt(timePieces[2]);
+    let deliveryStart = 8 * 3600
+    let deliveryEnd = 22 * 3600
 
-        if (period === "am") {
-            if (hours === 12) {
-                hours = 0;
-            }
-        } else {
-            if (hours !== 12) {
-                hours += 12;
-            }
-        }
-
-        return hours * 3600 + minutes * 60 + seconds;
-    }
-
-    function secondsToDuration(totalSeconds) {
-        let hours = Math.floor(totalSeconds / 3600);
-        let minutes = Math.floor((totalSeconds % 3600) / 60);
-        let seconds = totalSeconds % 60;
-
-        return hours + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-    }
-
-    let startSeconds = timeToSeconds(startTime);
-    let endSeconds = timeToSeconds(endTime);
-
-    let deliveryStart = 8 * 3600;   // 8 am
-    let deliveryEnd = 22 * 3600;    // 10pm prolly
-
-    let idleSeconds = 0;
+    let idleSeconds = 0
 
     if (startSeconds < deliveryStart) {
-        idleSeconds += deliveryStart - startSeconds;
+        idleSeconds += deliveryStart - startSeconds
     }
 
     if (endSeconds > deliveryEnd) {
-        idleSeconds += endSeconds - deliveryEnd;
+        idleSeconds += endSeconds - deliveryEnd
     }
 
-    return secondsToDuration(idleSeconds);
+    return secondsToDuration(idleSeconds)
 }
 
 // ============================================================
@@ -116,25 +89,11 @@ function getIdleTime(startTime, endTime) {
 
 // TODO: Implement this functio
 function getActiveTime(shiftDuration, idleTime) {
-    function durationToSeconds(durationStr) {
-        let parts = durationStr.trim().split(":");
-        let hours = parseInt(parts[0]);
-        let minutes = parseInt(parts[1]);
-        let seconds = parseInt(parts[2]);
-        return hours * 3600 + minutes * 60 + seconds;
-    }
+     let shiftSeconds = durationToSeconds(shiftDuration)
+    let idleSeconds = durationToSeconds(idleTime)
+    let activeSeconds = shiftSeconds - idleSeconds
 
-    function secondsToDuration(totalSeconds) {
-        let hours = Math.floor(totalSeconds / 3600);
-        let minutes = Math.floor((totalSeconds % 3600) / 60);
-        let seconds = totalSeconds % 60;
-
-        return hours + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-    }
-    let shiftSeconds = durationToSeconds(shiftDuration);
-    let idleSeconds = durationToSeconds(idleTime);
-    let activeSeconds = shiftSeconds - idleSeconds;
-    return secondsToDuration(activeSeconds);
+    return secondsToDuration(activeSeconds)
 }
 
 
@@ -146,34 +105,16 @@ function getActiveTime(shiftDuration, idleTime) {
 // ============================================================
 function metQuota(date, activeTime) {
     // TODO: Implement this function
-    function durationToSeconds(time) {
-        let parts = time.split(":")
-        let h = parseInt(parts[0])
-        let m = parseInt(parts[1])
-        let s = parseInt(parts[2])
-
-        return h * 3600 + m * 60 + s
-    }
-
-    let activeSeconds = durationToSeconds(activeTime)
+     let activeSeconds = durationToSeconds(activeTime)
 
     let normalQuota = 8 * 3600 + 24 * 60
     let eidQuota = 6 * 3600
 
     if (date >= "2025-04-10" && date <= "2025-04-30") {
-        if (activeSeconds >= eidQuota) {
-            return true
-        }
-        else { return false }
+        return activeSeconds >= eidQuota
     }
-
     else {
-        if (activeSeconds >= normalQuota) {
-            return true
-        }
-        else {
-            return false
-        }
+        return activeSeconds >= normalQuota
     }
 }
 
@@ -316,23 +257,6 @@ function countBonusPerMonth(textFile, driverID, month) {
 // Returns: string formatted as hhh:mm:ss
 // ============================================================
 function getTotalActiveHoursPerMonth(textFile, driverID, month) {
-    function durationToSeconds(time) { //need to replace all the durationToSeconds and secondsToDuration functions with  the helpers that iu will implement soon 
-        let parts = time.trim().split(":")
-        let h = parseInt(parts[0])
-        let m = parseInt(parts[1])
-        let s = parseInt(parts[2])
-
-        return h * 3600 + m * 60 + s
-    }
-
-    function secondsToDuration(totalSeconds) {
-        let h = Math.floor(totalSeconds / 3600)
-        let m = Math.floor((totalSeconds % 3600) / 60)
-        let s = totalSeconds % 60
-
-        return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0")
-    }
-
     let data = fs.readFileSync(textFile, "utf8")
     let lines = data.trim().split("\n")
 
@@ -365,13 +289,13 @@ function getTotalActiveHoursPerMonth(textFile, driverID, month) {
 // Returns: string formatted as hhh:mm:ss
 // ============================================================
 function getRequiredHoursPerMonth(textFile, rateFile, bonusCount, driverID, month) {
-    function secondsToDuration(totalSeconds) {
-        let h = Math.floor(totalSeconds / 3600)
-        let m = Math.floor((totalSeconds % 3600) / 60)
-        let s = totalSeconds % 60
+    // function secondsToDuration(totalSeconds) {
+    //     let h = Math.floor(totalSeconds / 3600)
+    //     let m = Math.floor((totalSeconds % 3600) / 60)
+    //     let s = totalSeconds % 60
 
-        return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0")
-    }
+    //     return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0")
+    // }
 
     let shiftData = fs.readFileSync(textFile, "utf8")
     let shiftLines = shiftData.trim().split("\n")
@@ -436,16 +360,7 @@ function getRequiredHoursPerMonth(textFile, rateFile, bonusCount, driverID, mont
 // Returns: integer (net pay)
 // ============================================================
 function getNetPay(driverID, actualHours, requiredHours, rateFile) {
-    function durationToSeconds(time) {
-        let parts = time.trim().split(":")
-        let h = parseInt(parts[0])
-        let m = parseInt(parts[1])
-        let s = parseInt(parts[2])
-
-        return h * 3600 + m * 60 + s
-    }
-
-    let data = fs.readFileSync(rateFile, "utf8")
+let data = fs.readFileSync(rateFile, "utf8")
     let lines = data.trim().split("\n")
 
     let basePay = 0
